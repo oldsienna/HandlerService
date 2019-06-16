@@ -26,7 +26,7 @@ def db_conn():
     # Otherwise, assume running locally with local MongoDB instance
     else:
 	    DB_ENDPOINT = MongoClient('127.0.0.1:27017')
-	    DB_NAME = "Dogs"
+	    DB_NAME = "Handlers"
     # Get database connection using database endpoint and name defined above
     global db
     db = DB_ENDPOINT[DB_NAME]
@@ -34,77 +34,91 @@ def db_conn():
 def init_db():
     db_conn() # Connect to database
 
-# Create a new dog entry
-def new_dog(dog):
-    # If dog id already exists in the system then raise an error
-    dog_exists = db.dog_details.find_one({'registration_id': dog['registration_id']})
+# Create a new handler entry
+def new_handler(handler):
+    # If handler email already exists in the system then raise an error
+    handler_exists = db.handler_details.find_one({'email': handler['email']})
 
-    if not dog_exists:
-        # Add dog to database
+    if not handler_exists:
+        # Add handler to database
         return_code = 0
-        _id = db.dog_details.insert({'registration_id': dog['registration_id'],
-                                    'description': dog['description'],
-                                    'handler_id': dog['handler_id'],
-                                    'name': dog['name'],
-                                    'pedigree': dog['pedigree'],
-                                    'reg_status': dog['reg_status'],
-                                    'vacc_status': dog['vacc_status']})
- 
+        _id = db.handler_details.insert({
+                                    'email': handler['email'],
+                                    'first_name': handler['first_name'],
+                                    'last_name': handler['last_name'],
+                                    'street': handler['street'],
+                                    'suburb': handler['suburb'],
+                                    'state': handler['state'],
+                                    'zip_code': handler['zip_code'],
+                                    'phone': handler['phone'],
+                                    'service_dog_id': handler['service_dog_id'],
+                                    'picture_ref': handler['picture_ref']
+                                    })
+    # Return the id of the newly created handler
 	return str(_id)
 
-# Retrieve a dog by id
-def get_dog(dog_id):
-    dog_rec = db.dog_details.find_one({'_id': ObjectId(dog_id)})
-    # Check if dog exists
-    if dog_rec:
-        dog = {
-            'id': dog_id,
-            'registration_id': dog_rec.get('registration_id'),
-            'name':dog_rec.get('name'),
-            'description': dog_rec.get('description'),
-            'handler_id': dog_rec.get('handler_id'),
-            'pedigree': dog_rec.get('pedigree'),
-            'reg_status': dog_rec.get('reg_status'),
-            'vacc_status': dog_rec.get('vacc_status')
+# Retrieve a handler by id
+def get_handler(handler_id):
+    handler = db.handler_details.find_one({'_id': ObjectId(handler_id)})
+    # Check if handler exists
+    if handler:
+        handler = {
+            'id': handler_id,
+            'email': handler.get('email'),
+            'first_name': handler.get('first_name'),
+            'last_name':handler.get('last_name'),
+            'street': handler.get('street'),
+            'suburb': handler.get('suburb'),
+            'state': handler.get('state'),
+            'zip_code': handler.get('zip_code'),
+            'phone': handler.get('phone'),
+            'service_dog_id': handler.get('service_dog_id'),
+            'picture_ref': handler.get('picture_ref')
         }
-        return dog
+        return handler
     else:
         return None
 
-# Return an array of dog details, limited by max_number
-def get_dogs(max_number = 10):
-    dogs = []
+# Return an array of handler details, limited by max_number
+def get_handlers(max_number = 10):
+    handlers = []
 
-    for dog in db.dog_details.find().sort("name", 1).limit(max_number):
-        dog = {
-            'id': str(dog.get('_id')),
-            'registration_id': dog.get('registration_id'),
-            'name': dog.get('name'),
-            'description': dog.get('description'),
-            'handler_id': dog.get('handler_id'),
-            'pedigree': dog.get('pedigree'),
-            'reg_status': dog.get('reg_status'),
-            'vacc_status': dog.get('vacc_status')
+    for handler in db.handler_details.find().sort("last_name", 1).limit(max_number):
+        handler = {
+            'id': str(handler.get('_id')),
+            'email': handler.get('email'),
+            'first_name': handler.get('first_name'),
+            'last_name': handler.get('last_name'),
+            'street': handler.get('street'),
+            'suburb': handler.get('suburb'),
+            'state': handler.get('state'),
+            'zip_code': handler.get('zip_code'),
+            'phone': handler.get('phone'),
+            'service_dog_id': handler.get('service_dog_id'),
+            'picture_ref': handler.get('picture_ref')
         }
-        dogs.append(dog)
+        handlers.append(handler)
 
-    return dogs
+    return handlers
 
-# Update a dog record
-def update_dog(dog):
-    # Update dog fields if present
-    db.dog_details.update_one({'_id': ObjectId(dog['id'])},
-                    { "$set" :{ 'registration_id': dog['registration_id'],
-                                'name': dog['name'],
-                                'description': dog['description'],
-                                'handler_id': dog['handler_id'],
-                                'pedigree': dog['pedigree'],
-                                'reg_status': dog['reg_status'],
-                                'vacc_status': dog['vacc_status'] }
+# Update a handler record
+def update_handler(handler):
+    # Update handler fields if present
+    db.handler_details.update_one({'_id': ObjectId(handler['id'])},
+                    { "$set" :{ 'email': handler.get('email'),
+                                'first_name': handler['first_name'],
+                                'last_name': handler['last_name'],
+                                'street': handler['street'],
+                                'suburb': handler['suburb'],
+                                'state': handler['state'],
+                                'zip_code': handler['zip_code'],
+                                'phone': handler['phone'],
+                                'service_dog_id': handler['service_dog_id'],
+                                'picture_ref': handler['picture_ref'] }
                     },
                     upsert=True)
     return
 
-# Delete a dog by id
-def delete_dog(dog_id):
-    db.dog_details.delete_one({'_id': ObjectId(dog_id)})
+# Delete a handler by id
+def delete_handler(handler_id):
+    db.handler_details.delete_one({'_id': ObjectId(handler_id)})

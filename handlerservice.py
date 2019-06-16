@@ -36,16 +36,20 @@ def get_handler(handler_id):
 # Service Call for creating a new handler
 @app.route('/api/v1.0/handler', methods = ['POST'])
 def create_handler():
-    if not request.json or not 'name' in request.json:
+    # Check for JSON input and mandatory email
+    if not request.json or not 'email' in request.json:
         abort(400)
     handler = {
-        'registration_id': request.json['registration_id'],
-        'name': request.json['name'],
-        'description': request.json.get('description', ""),
-        'handler_id': request.json.get('handler_id'),
-        'pedigree': request.json.get('pedigree'),
-        'reg_status': False,
-        'vacc_status': False
+        'email': request.json['email'],
+        'first_name': request.json['first_name'],
+        'last_name': request.json['last_name'],
+        'street': request.json.get('street'),
+        'suburb': request.json.get('suburb'),
+        'state': request.json.get('state'),
+        'zip_code': request.json.get('zip_code'),
+        'phone': request.json.get('phone', None),
+        'service_dog_id': request.json.get('service_dog_id', None),
+        'picture_ref': request.json.get('picture_ref', None)
     }
     id = models.new_handler(handler)
     handler['id'] = id
@@ -60,26 +64,36 @@ def update_handler(handler_id):
         abort(404)
     if not request.json:
         abort(400)
-    if 'name' in request.json and type(request.json['name']) != unicode:
+    if 'email' in request.json and type(request.json['email']) is not unicode:
         abort(400)
-    if 'description' in request.json and type(request.json['description']) is not unicode:
+    if 'first_name' in request.json and type(request.json['first_name']) is not unicode:
         abort(400)
-    if 'registration_id' in request.json and type(request.json['registration_id']) is not unicode:
+    if 'last_name' in request.json and type(request.json['last_name']) is not unicode:
         abort(400)
-    if 'handler_id' in request.json and type(request.json['handler_id']) is not int:
+    if 'street' in request.json and type(request.json['street']) is not unicode:
         abort(400)
-    if 'reg_status' in request.json and type(request.json['reg_status']) is not bool:
+    if 'suburb' in request.json and type(request.json['suburb']) is not unicode:
         abort(400)
-    if 'vacc_status' in request.json and type(request.json['vacc_status']) is not bool:
+    if 'state' in request.json and type(request.json['state']) is not unicode:
         abort(400)
-    if 'pedigree' in request.json and type(request.json['pedigree']) is not unicode:
+    if 'zip_code' in request.json and type(request.json['zip_code']) is not unicode:
         abort(400)
-    handler['name'] = request.json.get('name', handler['name'])
-    handler['registration_id'] = request.json.get('registration_id', handler['registration_id'])
-    handler['description'] = request.json.get('description', handler['description'])
-    handler['handler_id'] = request.json.get('handler_id', handler['handler_id'])
-    handler['reg_status'] = request.json.get('reg_status', handler['reg_status'])
-    handler['vacc_status'] = request.json.get('vacc_status', handler['vacc_status'])
+    if 'phone' in request.json and type(request.json['phone']) is not unicode:
+        abort(400)
+    if 'service_dog_id' in request.json and type(request.json['service_dog_id']) is not unicode:
+        abort(400)
+    if 'picture_ref' in request.json and type(request.json['picture_ref']) is not unicode:
+        abort(400)
+    handler['email'] = request.json.get('email', handler['email'])
+    handler['first_name'] = request.json.get('first_name', handler['first_name'])
+    handler['last_name'] = request.json.get('last_name', handler['last_name'])
+    handler['street'] = request.json.get('street', handler['street'])
+    handler['suburb'] = request.json.get('suburb', handler['suburb'])
+    handler['state'] = request.json.get('state', handler['state'])
+    handler['zip_code'] = request.json.get('zip_code', handler['zip_code'])
+    handler['phone'] = request.json.get('phone', handler['phone'])
+    handler['service_dog_id'] = request.json.get('service_dog_id', handler['service_dog_id'])
+    handler['picture_ref'] = request.json.get('picture_ref', handler['picture_ref'])
     models.update_handler(handler)
 
     return jsonify( { 'handler': handler } )
@@ -88,7 +102,7 @@ def update_handler(handler_id):
 @app.route('/api/v1.0/handler/<string:handler_id>', methods = ['DELETE'])
 def delete_handler(handler_id):
     handler = models.get_handler(handler_id)
-    if len(handler) == 0:
+    if handler is None:
         abort(404)
     models.delete_handler(handler_id)
     return jsonify( { 'result': True } )
