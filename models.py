@@ -51,7 +51,6 @@ def new_handler(handler):
                                     'state': handler['state'],
                                     'zip_code': handler['zip_code'],
                                     'phone': handler['phone'],
-                                    'service_dog_id': handler['service_dog_id'],
                                     'picture_ref': handler['picture_ref']
                                     })
     # Return the id of the newly created handler
@@ -72,7 +71,6 @@ def get_handler(handler_id):
             'state': handler.get('state'),
             'zip_code': handler.get('zip_code'),
             'phone': handler.get('phone'),
-            'service_dog_id': handler.get('service_dog_id'),
             'picture_ref': handler.get('picture_ref')
         }
         return handler
@@ -94,7 +92,6 @@ def get_handlers(max_number = 10):
             'state': handler.get('state'),
             'zip_code': handler.get('zip_code'),
             'phone': handler.get('phone'),
-            'service_dog_id': handler.get('service_dog_id'),
             'picture_ref': handler.get('picture_ref')
         }
         handlers.append(handler)
@@ -113,7 +110,6 @@ def update_handler(handler):
                                 'state': handler['state'],
                                 'zip_code': handler['zip_code'],
                                 'phone': handler['phone'],
-                                'service_dog_id': handler['service_dog_id'],
                                 'picture_ref': handler['picture_ref'] }
                     },
                     upsert=True)
