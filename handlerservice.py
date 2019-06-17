@@ -39,17 +39,16 @@ def create_handler():
     # Check for JSON input and mandatory email
     if not request.json or not 'email' in request.json:
         abort(400)
+
     handler = {
         'email': request.json['email'],
         'first_name': request.json['first_name'],
         'last_name': request.json['last_name'],
-        'street': request.json.get('street'),
-        'suburb': request.json.get('suburb'),
-        'state': request.json.get('state'),
-        'zip_code': request.json.get('zip_code'),
-        'phone': request.json.get('phone', None),
-        'service_dog_id': request.json.get('service_dog_id', None),
-        'picture_ref': request.json.get('picture_ref', None)
+        'street': request.json.get('street', None),
+        'suburb': request.json.get('suburb', None),
+        'state': request.json.get('state', None),
+        'zip_code': request.json.get('zip_code', None),
+        'phone': request.json.get('phone', None)
     }
     id = models.new_handler(handler)
     handler['id'] = id
@@ -80,10 +79,6 @@ def update_handler(handler_id):
         abort(400)
     if 'phone' in request.json and type(request.json['phone']) is not unicode:
         abort(400)
-    if 'service_dog_id' in request.json and type(request.json['service_dog_id']) is not unicode:
-        abort(400)
-    if 'picture_ref' in request.json and type(request.json['picture_ref']) is not unicode:
-        abort(400)
     handler['email'] = request.json.get('email', handler['email'])
     handler['first_name'] = request.json.get('first_name', handler['first_name'])
     handler['last_name'] = request.json.get('last_name', handler['last_name'])
@@ -92,8 +87,6 @@ def update_handler(handler_id):
     handler['state'] = request.json.get('state', handler['state'])
     handler['zip_code'] = request.json.get('zip_code', handler['zip_code'])
     handler['phone'] = request.json.get('phone', handler['phone'])
-    handler['service_dog_id'] = request.json.get('service_dog_id', handler['service_dog_id'])
-    handler['picture_ref'] = request.json.get('picture_ref', handler['picture_ref'])
     models.update_handler(handler)
 
     return jsonify( { 'handler': handler } )

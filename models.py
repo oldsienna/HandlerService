@@ -50,8 +50,7 @@ def new_handler(handler):
                                     'suburb': handler['suburb'],
                                     'state': handler['state'],
                                     'zip_code': handler['zip_code'],
-                                    'phone': handler['phone'],
-                                    'picture_ref': handler['picture_ref']
+                                    'phone': handler['phone']
                                     })
     # Return the id of the newly created handler
 	return str(_id)
@@ -70,8 +69,7 @@ def get_handler(handler_id):
             'suburb': handler.get('suburb'),
             'state': handler.get('state'),
             'zip_code': handler.get('zip_code'),
-            'phone': handler.get('phone'),
-            'picture_ref': handler.get('picture_ref')
+            'phone': handler.get('phone')
         }
         return handler
     else:
@@ -91,8 +89,7 @@ def get_handlers(max_number = 10):
             'suburb': handler.get('suburb'),
             'state': handler.get('state'),
             'zip_code': handler.get('zip_code'),
-            'phone': handler.get('phone'),
-            'picture_ref': handler.get('picture_ref')
+            'phone': handler.get('phone')
         }
         handlers.append(handler)
 
@@ -102,15 +99,17 @@ def get_handlers(max_number = 10):
 def update_handler(handler):
     # Update handler fields if present
     db.handler_details.update_one({'_id': ObjectId(handler['id'])},
-                    { "$set" :{ 'email': handler.get('email'),
+                    { "$set" :
+                            { 
+                                'email': handler.get('email'),
                                 'first_name': handler['first_name'],
                                 'last_name': handler['last_name'],
                                 'street': handler['street'],
                                 'suburb': handler['suburb'],
                                 'state': handler['state'],
                                 'zip_code': handler['zip_code'],
-                                'phone': handler['phone'],
-                                'picture_ref': handler['picture_ref'] }
+                                'phone': handler['phone'] 
+                            }
                     },
                     upsert=True)
     return
