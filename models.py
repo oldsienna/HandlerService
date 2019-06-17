@@ -41,8 +41,7 @@ def new_handler(handler):
 
     if not handler_exists:
         # Add handler to database
-        return_code = 0
-        _id = db.handler_details.insert({
+        _id = db.handler_details.insert_one({
                                     'email': handler['email'],
                                     'first_name': handler['first_name'],
                                     'last_name': handler['last_name'],
@@ -53,7 +52,7 @@ def new_handler(handler):
                                     'phone': handler['phone']
                                     })
     # Return the id of the newly created handler
-	return str(_id)
+	return str(_id.inserted_id)
 
 # Retrieve a handler by id
 def get_handler(handler_id):
@@ -117,3 +116,23 @@ def update_handler(handler):
 # Delete a handler by id
 def delete_handler(handler_id):
     db.handler_details.delete_one({'_id': ObjectId(handler_id)})
+
+# Generic search by criteria (dictionary of fields)
+def search(criteria):
+    handlers = []
+
+    for handler in db.handler_details.find(criteria):
+        handler = {
+            'id': str(handler.get('_id')),
+            'email': handler.get('email'),
+            'first_name': handler.get('first_name'),
+            'last_name': handler.get('last_name'),
+            'street': handler.get('street'),
+            'suburb': handler.get('suburb'),
+            'state': handler.get('state'),
+            'zip_code': handler.get('zip_code'),
+            'phone': handler.get('phone')
+        }
+        handlers.append(handler)
+
+    return handlers

@@ -41,13 +41,13 @@ def create_handler():
         abort(400)
 
     handler = {
-        'email': request.json['email'],
-        'first_name': request.json['first_name'],
-        'last_name': request.json['last_name'],
+        'email': request.json['email'].strip().lower(),
+        'first_name': request.json['first_name'].strip().capitalize(),
+        'last_name': request.json['last_name'].strip().capitalize(),
         'street': request.json.get('street', None),
-        'suburb': request.json.get('suburb', None),
-        'state': request.json.get('state', None),
-        'zip_code': request.json.get('zip_code', None),
+        'suburb': request.json.get('suburb', None).strip().capitalize(),
+        'state': request.json.get('state', None).strip().upper(),
+        'zip_code': request.json.get('zip_code', None).strip(),
         'phone': request.json.get('phone', None)
     }
     id = models.new_handler(handler)
@@ -59,6 +59,7 @@ def create_handler():
 @app.route('/api/v1.0/handler/<string:handler_id>', methods = ['PUT'])
 def update_handler(handler_id):
     handler = models.get_handler(handler_id)
+    # Exhaustive checking of the input arguments before passing to DB
     if len(handler) == 0:
         abort(404)
     if not request.json:
@@ -79,6 +80,7 @@ def update_handler(handler_id):
         abort(400)
     if 'phone' in request.json and type(request.json['phone']) is not unicode:
         abort(400)
+    
     handler['email'] = request.json.get('email', handler['email'])
     handler['first_name'] = request.json.get('first_name', handler['first_name'])
     handler['last_name'] = request.json.get('last_name', handler['last_name'])
@@ -99,6 +101,29 @@ def delete_handler(handler_id):
         abort(404)
     models.delete_handler(handler_id)
     return jsonify( { 'result': True } )
+
+# Service Call for finding handlers by criteria (similar to Update Handler method)
+# Accepts a single field or multiple fields which are then AND'ed
+@app.route('/api/v1.0/search', methods = ['PUT'])
+def search():
+    if not request.json:
+        abort(400)
+    criteria = {}
+
+    if 'email' in request.json:
+        email = str(request.json['email']).strip().lower()
+        criteria['email'] = email
+
+    if 'last_name' in request.json:
+        last_name = str(request.json['last_name']).strip().capitalize()
+        criteria['last_name'] = last_name
+
+    if 'zip_code' in request.json:
+        zip_code = str(request.json['zip_code']).strip()
+        criteria['zip_code'] = zip_code
+
+    handler = models.search(criteria)
+    return jsonify( {'handlers': handler} )
 
 # Initialise DB before starting web service
 models.init_db()
