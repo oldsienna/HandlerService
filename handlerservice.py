@@ -36,20 +36,31 @@ def get_handler(handler_id):
 # Service Call for creating a new handler
 @app.route('/api/v1.0/handler', methods = ['POST'])
 def create_handler():
-    # Check for JSON input and mandatory email
-    if not request.json or not 'email' in request.json:
+    # Check for JSON input and mandatory email, first_name and last_name
+    if not request.json or not 'email' in request.json or not 'first_name' in request.json or not 'last_name' in request.json:
         abort(400)
 
     handler = {
-        'email': request.json['email'].strip().lower(),
-        'first_name': request.json['first_name'].strip().capitalize(),
-        'last_name': request.json['last_name'].strip().capitalize(),
+        'email': request.json['email'],
+        'first_name': request.json['first_name'],
+        'last_name': request.json['last_name'],
         'street': request.json.get('street', None),
-        'suburb': request.json.get('suburb', None).strip().capitalize(),
-        'state': request.json.get('state', None).strip().upper(),
-        'zip_code': request.json.get('zip_code', None).strip(),
+        'suburb': request.json.get('suburb', None),
+        'state': request.json.get('state', None),
+        'zip_code': request.json.get('zip_code', None),
         'phone': request.json.get('phone', None)
     }
+
+    # Clean up fields if they exist
+    if not (handler['email'] is None)      : handler['email'] = handler['email'].strip().lower()
+    if not (handler['first_name'] is None) : handler['first_name'] = handler['first_name'].strip().capitalize()
+    if not (handler['last_name'] is None)  : handler['last_name'] = handler['last_name'].strip().capitalize()
+    if not (handler['street'] is None)     : handler['street'] = handler['street'].strip()
+    if not (handler['suburb'] is None)     : handler['suburb'] = handler['suburb'].strip().capitalize()
+    if not (handler['state'] is None)      : handler['state'] = handler['state'].strip().upper()
+    if not (handler['zip_code'] is None)   : handler['zip_code'] = handler['zip_code'].strip()
+    if not (handler['phone'] is None)      : handler['phone'] = handler['phone'].strip()
+
     id = models.new_handler(handler)
     handler['id'] = id
 
